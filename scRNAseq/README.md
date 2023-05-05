@@ -31,23 +31,31 @@ done <SRR_Acc_List.txt
 
 ## CellBender
 
-*Disclaimer*: this part of the analysis is not fully reproducible, possibly due to different package versions,  slight shifts in training losses will lead to differing count matrices, it is recommended to reuse the cleaned matrices from GEO for reproducing analysis.
-
 ```bash
-mamba create -n cellbender pytorch==1.5.1 python=3.8 cudatoolkit=10.1 -c pytorch
+mamba create -n cellbender python=3.6 pytorch==1.4.0 -c pytorch -y
 mamba activate cellbender
-git clone https://github.com/broadinstitute/CellBender
-cd CellBender
-git checkout v0.1.0
-pip install -e .
-cd ..
 
+pip install -r cellbender_reqs_2020-02-25.txt
+git clone https://github.com/broadinstitute/CellBender
+cd CellBender && git checkout v0.1.0
+pip install -e .
+
+cd ..
+wget https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM4859nnn/GSM4859876/suppl/GSM4859876_100pka_raw_feature_bc_matrix.h5
 cellbender remove-background \
                  --epochs 150 \
-                 --input raw_feature_bc_matrix.h5 \
-                 --output cellbended.h5 \
-                 --expected-cells 2000 \
+                 --input GSM4859876_100pka_raw_feature_bc_matrix.h5 \
+                 --output 100pka_cellbender.h5 \
+                 --expected-cells 2100 \
+                 --total-droplets-included 10000 \
+                 --cuda
+
+wget https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM4859nnn/GSM4859875/suppl/GSM4859875_05pka_raw_feature_bc_matrix.h5
+cellbender remove-background \
+                 --epochs 150 \
+                 --input GSM4859875_05pka_raw_feature_bc_matrix.h5 \
+                 --output 05pka_cellbender.h5 \
+                 --expected-cells 1900 \
                  --total-droplets-included 10000 \
                  --cuda
 ```
-
